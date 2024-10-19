@@ -179,17 +179,17 @@ app.get('/rsa-fibonacci-multithreaded', (req, res) => {
 
 // Global dataset variable
 let dataset = []
-const numRecords = 1e7 // Default 70,000 records
+const numRecords = 1e6 // Default 70,000 records
 // Function to create the dataset in worker threads
 // Function to create the dataset in worker threads with time profiling
-function createDatasetInWorkers(numRecords) {
+function createDatasetInWorkers(numRecords, availableCores) {
     return new Promise((resolve, reject) => {
         const startTime = performance.now();  // Start time
         let completedWorkers = 0;
         let datasetChunks = [];
 
-        const chunkSize = Math.ceil(numRecords / numCPUs);
-        for (let i = 0; i < numCPUs; i++) {
+        const chunkSize = Math.ceil(numRecords / availableCores);
+        for (let i = 0; i < availableCores; i++) {
             const worker = new Worker('./create-dataset-worker.js', {
                 workerData: { startId: i * chunkSize + 1, endId: (i + 1) * chunkSize }
             });
@@ -197,7 +197,7 @@ function createDatasetInWorkers(numRecords) {
             worker.on('message', (chunk) => {
                 datasetChunks = datasetChunks.concat(chunk);
                 completedWorkers++;
-                if (completedWorkers === numCPUs) {
+                if (completedWorkers === availableCores) {
                     const endTime = performance.now();
                     console.log(`Dataset created in ${(endTime - startTime) / 1000} seconds`);
                     resolve(datasetChunks);
@@ -272,7 +272,8 @@ function searchInWorker (query) {
 app.get('/generate-dataset', async (req, res) => {
   try {
     const startTime = performance.now()
-    dataset = await createDatasetInWorkers(numRecords)
+    const availableCores = os.cpus().length - numCPUs
+    dataset = await createDatasetInWorkers(numRecords, availableCores)
     const endTime = performance.now()
     console.log(`Dataset created in ${(endTime - startTime) / 1000} seconds`)
 
