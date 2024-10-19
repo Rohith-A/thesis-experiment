@@ -1,0 +1,19 @@
+{
+  "name": "thesis-experiment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "author": {
+    "name": "Rohith Addula",
+    "email": "arohith9714@gmai.com"
+  },
+  "dependencies": {
+    "big-integer": "^1.6.52",
+    "express": "^4.21.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --max-old-space-size=4096 app.js",
+    "start-gendoc": "node swagger.js"
+  }
+}
