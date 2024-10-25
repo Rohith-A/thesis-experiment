@@ -23,7 +23,7 @@ const { query, chunk } = workerData;
 
 // Perform the search in the current chunk
 function searchDataset(query, chunk) {
-    return chunk.filter((record) => record.id == query); 
+    return chunk?.filter((record) => record.id == query); 
 }
 
 // Search the chunk and return the result
